@@ -20,6 +20,7 @@ const nextConfig = {
       },
     ],
   },
+  transpilePackages: ['@uiw/react-markdown-preview', '@uiw/react-md-editor'],
 };
 
 module.exports = nextConfig;

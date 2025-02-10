@@ -7,7 +7,7 @@ import axios from "axios";
 import { API_BASE_URL } from "@/config";
 import type { NextPage } from "next";
 import { Category } from "@/types/Category";
-import { OAuthSDK } from 'nanuid-websdk';
+import { OAuthSDK } from "nanuid-websdk";
 
 interface InitialContent {
   content: string;
@@ -26,7 +26,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
 }) => {
   const router = useRouter();
   const { id: postId } = router.query;
-  const draftKey = `draft_${postId || 'new'}`;
+  const draftKey = `draft_${postId || "new"}`;
 
   const [content, setContent] = useState<string>("");
   const [title, setTitle] = useState<string>("");
@@ -41,7 +41,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
     try {
       const token = await OAuthSDK.getToken();
       const validation = OAuthSDK.validateToken(token);
-      
+
       if (!validation.isValid) {
         const newToken = await OAuthSDK.reissueToken();
         if (!newToken) {
@@ -53,7 +53,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
 
       return axios.create({
         baseURL: API_BASE_URL,
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
     } catch (error) {
       console.error("Authentication error:", error);
