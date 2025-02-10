@@ -8,10 +8,17 @@ const Header: React.FC = () => {
     <header className="fixed bg-black w-full z-50">
       <div className="container mx-auto px-4 py-2 flex justify-between items-center">
         <Link href="/">
-          <Image src={logo} alt="donghyun.cc" width={150} height={32} className="h-8" />
+          <Image
+            src={logo}
+            alt="donghyun.cc"
+            height={32}
+            style={{ height: "auto" }}
+          />
         </Link>
         <nav>
-          <Link href="/article_list" className="text-white">게시물</Link>
+          <Link href="/article_list" className="text-white">
+            게시물
+          </Link>
         </nav>
       </div>
     </header>

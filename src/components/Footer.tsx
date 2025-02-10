@@ -10,7 +10,6 @@ const Footer: React.FC = () => {
           <Image 
             src={DonghyunLogo} 
             alt="DONGHYUN.CC" 
-            width={200} 
             height={40} 
             className="h-10 mb-3"
           />
