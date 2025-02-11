@@ -31,7 +31,7 @@ export function ConditionalAuthGuard({ children }: AuthGuardProps) {
         const refreshToken = OAuthSDK.getRefreshToken();
 
         if (!currentToken && !refreshToken) {
-          console.log("fuck");
+          redirectToLogin();
           return;
         }
 
@@ -56,7 +56,7 @@ export function ConditionalAuthGuard({ children }: AuthGuardProps) {
             }
           }
         }
-        // 액세스 토큰이 없지만 리프레시 토큰이 있는 경우
+       
         else if (refreshToken) {
           try {
             const newToken = await OAuthSDK.reissueToken(refreshToken);
