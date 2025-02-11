@@ -39,14 +39,14 @@ export default function AdminArticleManager() {
       const token = await getValidToken();
       if (!token) {
         toast.error("세션이 만료되었습니다. 다시 로그인해 주세요.");
-        OAuthSDK.logout("/");
+        //OAuthSDK.logout("/");
         return;
       }
       await fetchArticles(token);
     } catch (error) {
       toast.error("기사를 가져오는 중 오류가 발생했습니다.");
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        OAuthSDK.logout("/");
+        //OAuthSDK.logout("/");
       }
     }
   }, [router]);
@@ -81,7 +81,7 @@ export default function AdminArticleManager() {
     try {
       const token = await getValidToken();
       if (!token) {
-        OAuthSDK.logout("/");
+        //OAuthSDK.logout("/");
         return;
       }
 
@@ -103,7 +103,7 @@ export default function AdminArticleManager() {
     } catch (error) {
       toast.error("오류가 발생했어요");
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        OAuthSDK.logout("/");
+      //  OAuthSDK.logout("/");
       }
     }
   };
@@ -120,7 +120,7 @@ export default function AdminArticleManager() {
     try {
       const token = await getValidToken();
       if (!token) {
-        OAuthSDK.logout("/");
+        //OAuthSDK.logout("/");
         return;
       }
 
@@ -132,7 +132,7 @@ export default function AdminArticleManager() {
     } catch (error) {
       toast.error("오류가 발생했어요");
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        OAuthSDK.logout("/");
+       // OAuthSDK.logout("/");
       }
     }
   };
