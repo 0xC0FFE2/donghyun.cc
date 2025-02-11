@@ -15,7 +15,7 @@ export function ConditionalAuthGuard({ children }: AuthGuardProps) {
 
   useEffect(() => {
     const redirectToLogin = () => {
-      const redirectUrl = "https://id.nanu.cc/oauth?app_name=%22%EB%8F%99%ED%98%84%20%EA%B8%B0%EC%88%A0%20%EB%B8%94%EB%A1%9C%EA%B7%B8%22&auth_scope=2&redirect_uri=%22https://donghyun.cc/oauth_handler%22&app_id=7040dad6-b0ed-4b83-ab13-35535e39822e";
+      const redirectUrl = "http://id.nanu.cc/oauth?app_name=%EB%8F%99%ED%98%84%20%EA%B8%B0%EC%88%A0%20%EB%B8%94%EB%A1%9C%EA%B7%B8&auth_scope=[%22EMAIL%22]&redirect_uri=https://donghyun.cc/oauth_handler&app_id=7040dad6-b0ed-4b83-ab13-35535e39822e";
       window.location.href = redirectUrl.toString();
     };
 
