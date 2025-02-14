@@ -150,7 +150,7 @@ export default function AdminArticleManager() {
       <h1 className="text-2xl font-bold mb-4">게시글 관리</h1>
       <button
         onClick={() => router.push("/admin/editor")}
-        className="mb-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+        className="mb-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mr-4 transition-colors"
       >
         새 게시글 작성하기
       </button>
