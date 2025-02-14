@@ -144,7 +144,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
       const contentUrl = await uploadContent();
       if (!contentUrl) return;
 
-      await authAxios.post("/admin/articles", {
+      await authAxios.post("/admin", {
         article_date: new Date().toISOString(),
         article_name: title,
         thumbnail_url: thumbnailURL,
@@ -154,7 +154,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
       });
       toast.success("성공적으로 퍼블리싱되었습니다!");
       localStorage.removeItem(draftKey);
-      router.push("/admin/articles");
+      router.push("/admin");
     } catch (error) {
       toast.error("퍼블리싱 중 오류가 발생했습니다.");
     }
