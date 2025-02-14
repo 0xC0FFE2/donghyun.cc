@@ -81,7 +81,7 @@ export default function AdminArticleManager() {
     try {
       const token = await getValidToken();
       if (!token) {
-        //OAuthSDK.logout("/");
+        OAuthSDK.logout("/");
         return;
       }
 
@@ -103,7 +103,7 @@ export default function AdminArticleManager() {
     } catch (error) {
       toast.error("오류가 발생했어요");
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-      //  OAuthSDK.logout("/");
+        //  OAuthSDK.logout("/");
       }
     }
   };
@@ -132,7 +132,7 @@ export default function AdminArticleManager() {
     } catch (error) {
       toast.error("오류가 발생했어요");
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-       // OAuthSDK.logout("/");
+        // OAuthSDK.logout("/");
       }
     }
   };
@@ -149,10 +149,17 @@ export default function AdminArticleManager() {
       <ToastContainer />
       <h1 className="text-2xl font-bold mb-4">게시글 관리</h1>
       <button
-        onClick={() => router.push("/editor/new")}
+        onClick={() => router.push("/admin/editor")}
         className="mb-4 inline-block bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
       >
         새 게시글 작성하기
+      </button>
+
+      <button
+        onClick={() => router.push("/admin/uploader")}
+        className="mb-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-green-600 transition-colors"
+      >
+        파일 업로더
       </button>
 
       {selectedArticle && (
