@@ -36,7 +36,7 @@ export default function OAuthHandler() {
 
         OAuthSDK.setTokens(access_token, refresh_token);
           
-        //router.push("/admin");
+        router.push("/admin");
       } catch (error) {
         console.error("OAuth 처리 중 오류 발생:", error);
       }
