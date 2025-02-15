@@ -1,36 +1,36 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Layout from "@/components/Layout";
-import '@uiw/react-markdown-preview/markdown.css';
-import '@uiw/react-md-editor/markdown-editor.css';
+import "@uiw/react-markdown-preview/markdown.css";
+import "@uiw/react-md-editor/markdown-editor.css";
 import { ConditionalAuthGuard } from "@/components/providers/authGuard";
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import GlobalLoading from '@/components/GlobalLoading';
-import Head from 'next/head';
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import GlobalLoading from "@/components/GlobalLoading";
+import Head from "next/head";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const defaultTitle = "동현 기술 블로그";
+  const defaultTitle = "이동현의 개발 블로그 - DONGHYUN.CC";
 
   useEffect(() => {
     const handleStart = (url: string) => {
-      if (url.startsWith('/article/')) {
+      if (url.startsWith("/article/")) {
         setIsLoading(true);
       }
     };
     const handleComplete = () => setIsLoading(false);
     const handleError = () => setIsLoading(false);
 
-    router.events.on('routeChangeStart', handleStart);
-    router.events.on('routeChangeComplete', handleComplete);
-    router.events.on('routeChangeError', handleError);
+    router.events.on("routeChangeStart", handleStart);
+    router.events.on("routeChangeComplete", handleComplete);
+    router.events.on("routeChangeError", handleError);
 
     return () => {
-      router.events.off('routeChangeStart', handleStart);
-      router.events.off('routeChangeComplete', handleComplete);
-      router.events.off('routeChangeError', handleError);
+      router.events.off("routeChangeStart", handleStart);
+      router.events.off("routeChangeComplete", handleComplete);
+      router.events.off("routeChangeError", handleError);
     };
   }, [router]);
 
