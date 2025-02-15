@@ -98,7 +98,7 @@ const ArticleViewPage: NextPage<ArticleViewPageProps> = ({
           property="article:published_time"
           content={article.article_date}
         />
-        {article.categorys?.map((category) => (
+        {article.categories?.map((category) => (
           <meta
             key={category.category_id}
             property="article:tag"
@@ -120,9 +120,9 @@ const ArticleViewPage: NextPage<ArticleViewPageProps> = ({
 
             <div className="flex flex-wrap items-center gap-2 text-gray-600">
               <time dateTime={article.article_date}>{formattedDate}</time>
-              {article.categorys?.length > 0 ? (
+              {article.categories?.length > 0 ? (
                 <div className="flex gap-2">
-                  {article.categorys.map((category) => (
+                  {article.categories.map((category) => (
                     <span
                       key={category.category_id}
                       className="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700"

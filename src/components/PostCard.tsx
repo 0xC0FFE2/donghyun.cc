@@ -7,7 +7,7 @@ interface PostCardProps {
   id: number;
   title: string;
   date: string;
-  category: Category[] | null;
+  category: string[] | null;
   image: string;
 }
 
@@ -41,10 +41,10 @@ const PostCard: React.FC<PostCardProps> = ({
               {category && category.length > 0 ? (
                 category.map((cat) => (
                   <span
-                    key={cat.category_id}
+                    key={cat}
                     className="bg-blue-100 text-blue-700 px-2 py-1 rounded-md text-xs"
                   >
-                    {cat.category_name}
+                    {cat}
                   </span>
                 ))
               ) : (

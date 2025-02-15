@@ -60,7 +60,9 @@ const RecentPosts: React.FC<RecentPostsProps> = ({ size }) => {
                 month: "2-digit",
                 day: "2-digit",
               })}
-              category={post.categorys || []}
+              category={Array.isArray(post.categories) 
+                ? post.categories.map(cat => typeof cat === 'string' ? cat : cat.category_name) 
+                : []}
               image={
                 post.thumbnail_url || "https://nanu.cc/NANU-Brand-Loader.jpg"
               }

@@ -14,7 +14,7 @@ const DEFAULT_CATEGORIES = [
   "전체",
   "소프트웨어 개발 개념",
   "백엔드",
-  "프론트엔드",
+  "AWS",
   "CI/CD",
 ];
 
@@ -140,7 +140,13 @@ const CategoryPosts: React.FC<CategoryPostsProps> = ({ size, mode }) => {
                   month: "2-digit",
                   day: "2-digit",
                 })}
-                category={post.categorys}
+                category={
+                  Array.isArray(post.categories)
+                    ? post.categories.map((cat) =>
+                        typeof cat === "string" ? cat : cat.category_name
+                      )
+                    : []
+                }
                 image={
                   post.thumbnail_url || "https://nanu.cc/NANU-Brand-Loader.jpg"
                 }

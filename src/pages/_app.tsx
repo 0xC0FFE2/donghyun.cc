@@ -7,10 +7,12 @@ import { ConditionalAuthGuard } from "@/components/providers/authGuard";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import GlobalLoading from '@/components/GlobalLoading';
+import Head from 'next/head';
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const defaultTitle = "동현 기술 블로그";
 
   useEffect(() => {
     const handleStart = (url: string) => {
@@ -33,11 +35,17 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router]);
 
   return (
-    <Layout>
-      <GlobalLoading isLoading={isLoading} />
-      <ConditionalAuthGuard>
-        <Component {...pageProps} />
-      </ConditionalAuthGuard>
-    </Layout>
+    <>
+      <Head>
+        <title>{pageProps.title || defaultTitle}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
+      <Layout>
+        <GlobalLoading isLoading={isLoading} />
+        <ConditionalAuthGuard>
+          <Component {...pageProps} />
+        </ConditionalAuthGuard>
+      </Layout>
+    </>
   );
 }

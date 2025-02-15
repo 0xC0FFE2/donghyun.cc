@@ -6,5 +6,5 @@ export interface Article {
   article_date: string;
   article_data_url: string;
   thumbnail_url: string;
-  categorys: Category[];
+  categories: Category[];
 }
