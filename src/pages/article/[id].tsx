@@ -122,12 +122,14 @@ const ArticleViewPage: NextPage<ArticleViewPageProps> = ({
               <time dateTime={article.article_date}>{formattedDate}</time>
               {article.categories?.length > 0 ? (
                 <div className="flex gap-2">
-                  {article.categories.map((category) => (
+                  {article.categories.map((category, index) => (
                     <span
-                      key={category.category_id}
+                      key={`category-${index}`}
                       className="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700"
                     >
-                      {category.category_name}
+                      {typeof category === "string"
+                        ? category
+                        : category.category_name}
                     </span>
                   ))}
                 </div>

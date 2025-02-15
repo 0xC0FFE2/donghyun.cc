@@ -1,36 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL } from '@/config'
 
-const twelveHours = 12 * 60 * 60 * 1000;
-
 const PeopleCount: React.FC = () => {
   const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
-    const currentTime = Date.now();
-    const cachedData = localStorage.getItem("blogData");
-    const cachedTime = localStorage.getItem("lastUpdated");
-
-    if (cachedData && cachedTime) {
-      const parsedTime = parseInt(cachedTime, 10);
-
-      if (!isNaN(parsedTime) && currentTime - parsedTime < twelveHours) {
-        try {
-          const data = JSON.parse(cachedData) as { blog_total_views: number };
-          setCount(data.blog_total_views);
-          return;
-        } catch (error) {
-          console.error("Error parsing cached data:", error);
-        }
-      }
-    }
-
     fetch(`${API_BASE_URL}/blog/info`)
       .then((response) => response.json())
       .then((data: { blog_total_views: number }) => {
         setCount(data.blog_total_views);
-        localStorage.setItem("blogData", JSON.stringify(data));
-        localStorage.setItem("lastUpdated", currentTime.toString());
       })
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
