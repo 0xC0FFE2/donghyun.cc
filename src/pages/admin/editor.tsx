@@ -144,7 +144,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
       const contentUrl = await uploadContent();
       if (!contentUrl) return;
 
-      await authAxios.post("/admin", {
+      await authAxios.post("/admin/articles", {
         article_date: new Date().toISOString(),
         article_name: title,
         thumbnail_url: thumbnailURL,
