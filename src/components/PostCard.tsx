@@ -20,7 +20,7 @@ const PostCard: React.FC<PostCardProps> = ({
 }) => {
   return (
     <Link href={`/article/${id}`}>
-      <div className="block bg-gray-100 rounded-lg overflow-hidden mb-6 hover:shadow-md transition-shadow duration-300 ring-0 hover:ring-2 hover:ring-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      <div className="block bg-gray-100 rounded-lg overflow-hidden mb-6 hover:shadow-md transition-shadow duration-300 ring-0 hover:ring-2 hover:ring-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none h-96">
         <div className="relative w-full h-48">
           <Image
             src={
@@ -33,11 +33,12 @@ const PostCard: React.FC<PostCardProps> = ({
             className="bg-gray-200 object-cover"
           />
         </div>
-        <div className="p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
-          <div className="flex justify-between text-sm text-gray-500">
-            <span>{date}</span>
-            <div className="flex gap-2">
+        <div className="p-6 h-48 flex flex-col">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4 overflow-hidden display-webkit-box webkit-line-clamp-3 webkit-box-orient-vertical">
+            {title}
+          </h3>
+          <div className="flex flex-col gap-2 mt-auto">
+            <div className="flex flex-wrap gap-2">
               {category && category.length > 0 ? (
                 category.map((cat) => (
                   <span
@@ -53,6 +54,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 </span>
               )}
             </div>
+            <span className="text-sm text-gray-500">{date}</span>
           </div>
         </div>
       </div>
