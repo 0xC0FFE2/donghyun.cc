@@ -114,7 +114,7 @@ const ArticleViewPage: NextPage<ArticleViewPageProps> = ({
       </Head>
 
       <div className="container mx-auto px-4 py-12 pt-20">
-        <article className="max-w-3xl mx-auto">
+        <article className="max-w-2xl mx-auto">
           <header className="mb-8">
             <h1 className="text-4xl font-bold mb-4">{article.article_name}</h1>
 
