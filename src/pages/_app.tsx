@@ -1,8 +1,6 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Layout from "@/components/Layout";
-import "@uiw/react-markdown-preview/markdown.css";
-import "@uiw/react-md-editor/markdown-editor.css";
 import { ConditionalAuthGuard } from "@/components/providers/authGuard";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";

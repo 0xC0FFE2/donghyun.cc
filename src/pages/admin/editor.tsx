@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import MDEditor from "@uiw/react-md-editor";
+import dynamic from "next/dynamic";
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -8,6 +10,12 @@ import { API_BASE_URL } from "@/config";
 import type { NextPage } from "next";
 import { Category } from "@/types/Category";
 import { OAuthSDK } from "nanuid-websdk";
+
+// 코드 하이라이팅 관련 스타일
+// @uiw/react-md-editor에 기본 코드 하이라이팅이 포함되어 있어 별도 설정 필요 없음
+
+// 서버 사이드 렌더링 이슈를 방지하기 위해 동적 임포트
+const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 interface InitialContent {
   content: string;
@@ -36,6 +44,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
   const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [fileUrl, setFileUrl] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
+  const [editorHeight, setEditorHeight] = useState<string>("500px");
 
   const getAuthenticatedAxios = useCallback(async () => {
     try {
@@ -96,7 +105,18 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
     fetchCategories();
   }, [getAuthenticatedAxios]);
 
-  const saveToLocalStorage = useCallback(() => {
+  // 자동 저장 기능 추가
+  useEffect(() => {
+    const autoSaveInterval = setInterval(() => {
+      if (content || title || thumbnailURL) {
+        saveToLocalStorage(false); // silent save (no toast)
+      }
+    }, 60000); // 1분마다 자동 저장
+
+    return () => clearInterval(autoSaveInterval);
+  }, [content, title, thumbnailURL, selectedCategories]);
+
+  const saveToLocalStorage = useCallback((showToast = true) => {
     if (typeof window !== "undefined") {
       const contentToSave = {
         content,
@@ -105,7 +125,9 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
         categories: selectedCategories,
       };
       localStorage.setItem(draftKey, JSON.stringify(contentToSave));
-      toast.info("임시 저장되었습니다.");
+      if (showToast) {
+        toast.info("임시 저장되었습니다.");
+      }
     }
   }, [content, title, thumbnailURL, selectedCategories, draftKey]);
 
@@ -137,6 +159,16 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
   };
 
   const handlePublish = async (viewMode: "PUBLIC" | "PRIVATE") => {
+    if (!title.trim()) {
+      toast.error("제목을 입력해주세요.");
+      return;
+    }
+
+    if (!content.trim()) {
+      toast.error("내용을 입력해주세요.");
+      return;
+    }
+
     const authAxios = await getAuthenticatedAxios();
     if (!authAxios) return;
 
@@ -189,8 +221,32 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
     }
   };
 
+  // 웹브라우저에서만 랜더링되도록 조건부 렌더링
+  const renderEditor = () => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+    
+    return (
+      <MDEditor
+        value={content}
+        onChange={(value) => setContent(value || "")}
+        height={editorHeight}
+        preview="edit"
+        enableScroll={true}
+        highlightEnable={true}
+        textareaProps={{
+          placeholder: "내용을 입력하세요...",
+        }}
+        previewOptions={{
+          // 타입 오류를 피하기 위해 rehypePlugins 설정 제거
+        }}
+      />
+    );
+  };
+
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl mt-16">
+    <div className="container mx-auto px-4 py-12 max-w-5xl mt-16">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -262,24 +318,50 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          내용
-        </label>
-        <MDEditor
-          value={content}
-          onChange={(value) => setContent(value || "")}
-          preview="edit"
-          className="border border-gray-300 rounded-lg shadow-sm"
-        />
+        <div className="flex justify-between items-center mb-2">
+          <label className="block text-sm font-medium text-gray-700">
+            내용
+          </label>
+          <select 
+            value={editorHeight}
+            onChange={(e) => setEditorHeight(e.target.value)}
+            className="p-2 border border-gray-300 rounded-lg text-sm"
+          >
+            <option value="400px">높이: 작게</option>
+            <option value="500px">높이: 중간</option>
+            <option value="650px">높이: 크게</option>
+            <option value="800px">높이: 매우 크게</option>
+          </select>
+        </div>
+        <div data-color-mode="light">
+          {renderEditor()}
+        </div>
       </div>
 
       <div className="flex justify-between items-center">
-        <button
-          onClick={saveToLocalStorage}
-          className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-200"
-        >
-          임시 저장
-        </button>
+        <div>
+          <button
+            onClick={() => saveToLocalStorage(true)}
+            className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-200 mr-2"
+          >
+            임시 저장
+          </button>
+          <button
+            onClick={() => {
+              if (window.confirm("현재 작성 중인 내용을 모두 초기화하시겠습니까?")) {
+                setContent("");
+                setTitle("");
+                setThumbnailURL("");
+                setSelectedCategories([]);
+                localStorage.removeItem(draftKey);
+                toast.info("내용이 초기화되었습니다.");
+              }
+            }}
+            className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200"
+          >
+            초기화
+          </button>
+        </div>
         <div>
           <button
             onClick={() => handlePublish("PRIVATE")}
