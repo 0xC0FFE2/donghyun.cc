@@ -1,4 +1,4 @@
-import { GetServerSideProps, NextPage } from "next";
+import { GetStaticProps, GetStaticPaths, NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
@@ -98,11 +98,11 @@ const ArticleViewPage: NextPage<ArticleViewPageProps> = ({
           property="article:published_time"
           content={article.article_date}
         />
-        {article.categories?.map((category) => (
+        {article.categories?.map((category, index) => (
           <meta
-            key={category.category_id}
+            key={`meta-category-${index}`}
             property="article:tag"
-            content={category.category_name}
+            content={typeof category === "string" ? category : category.category_name || ""}
           />
         ))}
 
@@ -168,22 +168,65 @@ const ArticleViewPage: NextPage<ArticleViewPageProps> = ({
 
 export default ArticleViewPage;
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+// getStaticPaths - 빌드 시 미리 생성할 페이지 경로 정의
+export const getStaticPaths: GetStaticPaths = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/articles`);
+    
+    if (!response.ok) {
+      return {
+        paths: [],
+        fallback: 'blocking'
+      };
+    }
+    
+    const data = await response.json();
+    const articles = data.articles || [];
+    
+    if (!Array.isArray(articles)) {
+      console.error("API response is not in the expected format:", data);
+      return {
+        paths: [],
+        fallback: 'blocking'
+      };
+    }
+    
+    const paths = articles.map((article: Article) => ({
+      params: { id: article.article_id.toString() }
+    }));
+    
+    return {
+      paths,
+      fallback: 'blocking',
+    };
+  } catch (error) {
+    console.error("Failed to generate article paths:", error);
+    return {
+      paths: [],
+      fallback: 'blocking'
+    };
+  }
+};
+
+export const getStaticProps: GetStaticProps = async (context) => {
   const { id } = context.params as { id: string };
 
   try {
-    const response = await fetch(`${API_BASE_URL}/articles/${id}`);
-    if (!response.ok) {
+    const articleResponse = await fetch(`${API_BASE_URL}/articles/${id}`);
+    
+    if (!articleResponse.ok) {
       return {
         props: {
           article: null,
           content: null,
           error: "게시물을 찾을 수 없습니다.",
         },
+        revalidate: 600
       };
     }
 
-    const article: Article = await response.json();
+    const article: Article = await articleResponse.json();
+    
     const contentResponse = await fetch(article.article_data_url);
     const content = contentResponse.ok ? await contentResponse.text() : null;
 
@@ -192,6 +235,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         article,
         content,
       },
+      revalidate: 31536000
     };
   } catch (error) {
     console.error("Article fetch error:", error);
@@ -201,6 +245,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         content: null,
         error: "서버 오류가 발생했습니다.",
       },
+      revalidate: 604800
     };
   }
 };
