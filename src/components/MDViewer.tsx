@@ -10,6 +10,10 @@ interface MDViewerProps {
 }
 
 const MDViewer: React.FC<MDViewerProps> = ({ content }) => {
+  // 직접적인 전처리: 원본 마크다운의 "- -"를 HTML 공백 엔티티로 변환
+  // 이렇게 하면 마크다운 파서가 처리하기 전에 이미 변환되어 있음
+  const processedContent = content.replace(/^(\s*\*\s*)- -/gm, '$1\u00A0\u00A0\u00A0\u00A0');
+
   return (
     <div className="max-w-3xl mx-auto prose prose-lg">
       <ReactMarkdown
@@ -22,7 +26,7 @@ const MDViewer: React.FC<MDViewerProps> = ({ content }) => {
             <h2 className="text-3xl font-bold mt-8 mb-4 border-b pb-1 border-gray-200" {...props} />
           ),
           h3: (props) => (
-            <h3 className="text-2xl font-semibold mt-6 mb-3" {...props} />
+            <h3 className="text-2xl mt-6 mb-3" {...props} />
           ),
           p: ({ node, children, ...props }) => {
             if (
@@ -77,7 +81,7 @@ const MDViewer: React.FC<MDViewerProps> = ({ content }) => {
               </div>
             ) : (
               <code
-                className="bg-gray-100 rounded px-1.5 py-0.5 font-mono text-sm"
+                className="bg-yellow-200 font"
                 {...props}
               >
                 {children}
@@ -111,7 +115,7 @@ const MDViewer: React.FC<MDViewerProps> = ({ content }) => {
           strong: (props) => <strong className="font-bold" {...props} />,
         }}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   );

@@ -9,5 +9,9 @@
 }
 
 .w-md-editor * {
-  font-family: inherit;
+  font-family: "Wanted Sans", sans-serif;
+}
+
+.font {
+  font-family: "Wanted Sans", sans-serif;
 }
