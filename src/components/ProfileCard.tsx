@@ -34,7 +34,7 @@ const ProfileCard: React.FC = () => {
           />
         </div>
         <div className="flex-1">
-          <p className="text-sm text-gray-500 mb-1">NodeJS, Spring, DevOps Engineer</p>
+          <p className="text-sm text-gray-500 mb-1">Web Server Engineer</p>
           <h1 className="text-3xl font-bold text-gray-900">
             이동현{" "}
             <span className="hidden sm:inline font-normal text-gray-400">LEE DONGHYUN</span>
@@ -61,7 +61,7 @@ const ProfileCard: React.FC = () => {
           </div>
         </div>
       </div>
-      <p className="mt-4 text-gray-600">새로움과 편리함을 추구하는 서버 개발자 이동현 입니다!</p>
+      <p className="mt-4 text-gray-600">기술에 대한 이해를 바탕으로 문제를 해결하기 위해 노력하는 서버 개발자입니다</p>
     </div>
   );
 };
