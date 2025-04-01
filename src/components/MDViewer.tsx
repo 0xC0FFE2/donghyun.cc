@@ -10,8 +10,6 @@ interface MDViewerProps {
 }
 
 const MDViewer: React.FC<MDViewerProps> = ({ content }) => {
-  // 직접적인 전처리: 원본 마크다운의 "- -"를 HTML 공백 엔티티로 변환
-  // 이렇게 하면 마크다운 파서가 처리하기 전에 이미 변환되어 있음
   const processedContent = content.replace(/^(\s*\*\s*)- -/gm, '$1\u00A0\u00A0\u00A0\u00A0');
 
   return (

@@ -11,10 +11,6 @@ import type { NextPage } from "next";
 import { Category } from "@/types/Category";
 import { OAuthSDK } from "nanuid-websdk";
 
-// 코드 하이라이팅 관련 스타일
-// @uiw/react-md-editor에 기본 코드 하이라이팅이 포함되어 있어 별도 설정 필요 없음
-
-// 서버 사이드 렌더링 이슈를 방지하기 위해 동적 임포트
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
 interface InitialContent {
@@ -229,6 +225,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
     
     return (
       <MDEditor
+        className="font"
         value={content}
         onChange={(value) => setContent(value || "")}
         height={editorHeight}
