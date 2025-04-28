@@ -1,114 +1,31 @@
-/* @uiw/react-md-editor 스타일 오버라이딩 */
-
-/* 기본 에디터 컨테이너 */
+/* 기본 에디터 스타일 */
 .w-md-editor {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
-  box-shadow: none !important;
-  border: 1px solid #e2e8f0 !important;
+  font-family: system-ui, -apple-system, sans-serif;
+  box-shadow: none;
+  border: 1px solid #e2e8f0;
 }
 
-/* 에디터 영역 - 가장 중요한 부분 */
+/* 에디터 텍스트 영역 */
+.w-md-editor-text-input,
+.w-md-editor-text-pre,
 .w-md-editor-text {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-  -webkit-font-smoothing: auto !important;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-/* 편집 영역 (입력하는 곳) */
-.w-md-editor-text-input {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-  color: inherit !important;
-  -webkit-font-smoothing: auto !important;
-}
-
-/* 편집 텍스트 표시 영역 (보이는 곳) */
-.w-md-editor-text-pre, 
-.w-md-editor-text-pre > code, 
-.w-md-editor-text-pre > div {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-  -webkit-font-smoothing: auto !important;
-  word-break: normal !important;
-  word-wrap: normal !important;
-  white-space: pre !important;
-}
-
-/* 프리뷰 영역 */
-.w-md-editor-preview {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif !important;
-  font-size: 14px !important;
-  line-height: 1.6 !important;
-}
-
-/* 툴바 영역 */
-.w-md-editor-toolbar {
-  background-color: #f7fafc !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-
-/* 툴바 버튼 */
-.w-md-editor-toolbar button {
-  color: #4a5568 !important;
-}
-
-.w-md-editor-toolbar button:hover {
-  background-color: #edf2f7 !important;
-}
-
-/* 다크 모드 스타일 */
+/* 다크 모드 에디터 */
 .dark .w-md-editor {
-  background-color: #333333 !important;
-  border-color: #4a5568 !important;
+  background-color: #333333;
+  border-color: #4a5568;
 }
 
 .dark .w-md-editor-toolbar {
-  background-color: #262626 !important;
-  border-color: #4a5568 !important;
-}
-
-.dark .w-md-editor-toolbar button {
-  color: #e2e8f0 !important;
-}
-
-.dark .w-md-editor-toolbar button:hover {
-  background-color: #3a3a3a !important;
+  background-color: #262626;
+  border-color: #4a5568;
 }
 
 .dark .w-md-editor-content {
-  background-color: #333333 !important;
-  color: #e2e8f0 !important;
-}
-
-.dark .w-md-editor-preview {
-  background-color: #333333 !important;
-  color: #e2e8f0 !important;
-}
-
-/* 다크 모드에서의 코드 블록 */
-.dark .w-md-editor-preview pre {
-  background-color: #3a3a3a !important;
-  border-color: #4a5568 !important;
-}
-
-/* 다크 모드에서의 블록 인용구 */
-.dark .w-md-editor-preview blockquote {
-  border-left-color: #4a5568 !important;
-  background-color: #3a3a3a !important;
-}
-
-/* 에디터 폰트 렌더링 관련 핵심 수정 */
-.w-md-editor-text, 
-.w-md-editor-text-input,
-.w-md-editor-text-pre, 
-.w-md-editor-text-pre > code,
-.w-md-editor-text-pre > div {
-  text-rendering: optimizeLegibility !important;
-  letter-spacing: normal !important;
-  tab-size: 4 !important;
-  -moz-tab-size: 4 !important;
-  padding: 0 !important;
+  background-color: #333333;
+  color: #e2e8f0;
 }
