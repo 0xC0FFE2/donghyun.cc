@@ -118,14 +118,14 @@ const ArticleViewPage: NextPage<ArticleViewPageProps> = ({
           <header className="mb-8">
             <h1 className="text-4xl font-bold mb-4">{article.article_name}</h1>
 
-            <div className="flex flex-wrap items-center gap-2 text-gray-600">
+            <div className="flex flex-wrap items-center gap-2 text-gray-600 dark:text-gray-300">
               <time dateTime={article.article_date}>{formattedDate}</time>
               {article.categories?.length > 0 ? (
                 <div className="flex gap-2">
                   {article.categories.map((category, index) => (
                     <span
                       key={`category-${index}`}
-                      className="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700"
+                      className="bg-gray-200 dark:bg-gray-700 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 dark:text-gray-200"
                     >
                       {typeof category === "string"
                         ? category
@@ -134,7 +134,7 @@ const ArticleViewPage: NextPage<ArticleViewPageProps> = ({
                   ))}
                 </div>
               ) : (
-                <span className="text-gray-500">카테고리가 없습니다.</span>
+                <span className="text-gray-500 dark:text-gray-400">카테고리가 없습니다.</span>
               )}
             </div>
           </header>

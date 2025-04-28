@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import logo from "../assets/logo_full_long_clear.png";
+import ThemeToggle from "./ThemeToggle";
 
 const Header: React.FC = () => {
   return (
@@ -15,10 +16,11 @@ const Header: React.FC = () => {
             style={{ height: "auto" }}
           />
         </Link>
-        <nav>
+        <nav className="flex items-center space-x-4">
           <Link href="/article_list" className="text-white">
             게시물
           </Link>
+          <ThemeToggle />
         </nav>
       </div>
     </header>

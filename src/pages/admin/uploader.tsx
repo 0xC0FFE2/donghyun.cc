@@ -17,11 +17,11 @@ interface SubmitButtonProps {
 const FileInput: React.FC<FileInputProps> = ({ onFileChange }) => {
   return (
     <div className="flex items-center justify-center w-full">
-      <label className="flex flex-col w-full h-32 border-4 border-dashed hover:bg-gray-100 hover:border-gray-300">
+      <label className="flex flex-col w-full h-32 border-4 border-dashed hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 dark:border-gray-600">
         <div className="flex flex-col items-center justify-center pt-7">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="w-12 h-12 text-gray-400 group-hover:text-gray-600"
+            className="w-12 h-12 text-gray-400 dark:text-gray-300 group-hover:text-gray-600 dark:group-hover:text-gray-200"
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -31,7 +31,7 @@ const FileInput: React.FC<FileInputProps> = ({ onFileChange }) => {
               clipRule="evenodd"
             />
           </svg>
-          <p className="pt-1 text-sm tracking-wider text-gray-400 group-hover:text-gray-600">
+          <p className="pt-1 text-sm tracking-wider text-gray-400 dark:text-gray-300 group-hover:text-gray-600 dark:group-hover:text-gray-200">
             파일을 선택하거나 드래그하세요
           </p>
         </div>
@@ -50,7 +50,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({ uploading }) => {
     <button
       type="submit"
       disabled={uploading}
-      className="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
+      className="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 disabled:bg-blue-300 dark:disabled:bg-blue-800 disabled:cursor-not-allowed"
     >
       {uploading ? "업로드 중..." : "업로드"}
     </button>
@@ -138,20 +138,20 @@ const FileUploader: React.FC = () => {
 
   return (
     <div
-      className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-16"
+      className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg mt-16 dark:text-white"
       onPaste={handlePaste as unknown as React.ClipboardEventHandler}
     >
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">파일 업로드</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">파일 업로드</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <FileInput onFileChange={setFile} />
         <SubmitButton uploading={uploading} />
       </form>
       {fileUrl && (
         <div className="mt-4">
-          <h3 className="text-lg font-medium">업로드된 파일 URL:</h3>
+          <h3 className="text-lg font-medium dark:text-gray-200">업로드된 파일 URL:</h3>
           <a
             href={fileUrl}
-            className="text-blue-500 underline break-all"
+            className="text-blue-500 dark:text-blue-400 underline break-all"
             target="_blank"
             rel="noopener noreferrer"
           >

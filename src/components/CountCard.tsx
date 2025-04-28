@@ -20,18 +20,17 @@ const PeopleCount: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative overflow-hidden mt-4 p-4 rounded-xl bg-gradient-to-r from-blue-100 via-blue-200 to-indigo-300">
+    <div className="relative overflow-hidden mt-4 p-4 rounded-xl bg-white to-indigo-300 dark:bg-black">
       {isLoading ? (
         <div className="flex justify-center items-center h-12">
-          <div className="animate-pulse bg-blue-300 h-4 w-64 rounded"></div>
+          <div className="animate-pulse bg-blue-300 dark:bg-blue-700 h-4 w-64 rounded"></div>
         </div>
       ) : (
         <div className="relative z-10">
-          <h3 className="text-lg font-medium text-gray-800 text-center">
-            <span className="inline-block mr-1">📖</span> 
-            지금까지 총 <span className="font-bold text-indigo-700">{count.toLocaleString()}</span>명이
+          <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100 text-center">
+            지금까지 총 <span className="font-bold text-indigo-700 dark:text-indigo-300">{count.toLocaleString()}</span>명이
             <br className="sm:hidden" /> 사이트를 방문하여 지식을 얻어가셨습니다.
-            <p className="text-xs text-gray-500 mt-1">(매일 12시에 방문자 기록)</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">(매일 12시에 방문자 기록)</p>
           </h3>
         </div>
       )}

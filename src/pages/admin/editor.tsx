@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
+import "@/styles/editor.css"; // 커스텀 에디터 스타일
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -41,6 +42,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
   const [fileUrl, setFileUrl] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
   const [editorHeight, setEditorHeight] = useState<string>("500px");
+  const [darkMode, setDarkMode] = useState<boolean>(false);
 
   const getAuthenticatedAxios = useCallback(async () => {
     try {
@@ -68,6 +70,34 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
     }
   }, [router]);
 
+  // 다크 모드 감지 
+  useEffect(() => {
+    // 페이지 로드 시 HTML 요소의 dark 클래스 여부 확인
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    setDarkMode(isDarkMode);
+    
+    // 다크 모드 변경 감지를 위한 MutationObserver 설정
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'class'
+        ) {
+          const isDark = document.documentElement.classList.contains('dark');
+          setDarkMode(isDark);
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+
+  // 초기 콘텐츠 로드
   useEffect(() => {
     if (initialContent) {
       setContent(initialContent.content);
@@ -225,7 +255,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
     
     return (
       <MDEditor
-        className="font"
+        className="font-mono"
         value={content}
         onChange={(value) => setContent(value || "")}
         height={editorHeight}
@@ -234,6 +264,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
         highlightEnable={true}
         textareaProps={{
           placeholder: "내용을 입력하세요...",
+          style: { fontFamily: "monospace" }, // 모노스페이스 폰트 적용
         }}
         previewOptions={{
           // 타입 오류를 피하기 위해 rehypePlugins 설정 제거
@@ -243,7 +274,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-5xl mt-16">
+    <div className="container mx-auto px-4 py-12 max-w-5xl mt-16 dark:text-white">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -253,7 +284,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
       <h1 className="text-3xl font-bold mb-6">게시글 작성</h1>
 
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           제목
         </label>
         <input
@@ -261,12 +292,12 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="제목을 입력하세요"
-          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-dark-card dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           썸네일 URL
         </label>
         <input
@@ -274,12 +305,12 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
           value={thumbnailURL}
           onChange={(e) => setThumbnailURL(e.target.value)}
           placeholder="썸네일 URL을 입력하세요"
-          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 border border-gray-300 dark:border-gray-600 dark:bg-dark-card dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           카테고리
         </label>
         <div className="flex flex-wrap gap-2 mb-2">
@@ -290,7 +321,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
               className={`px-3 py-1 rounded-full text-sm ${
                 selectedCategories.includes(category.category_id)
                   ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
+                  : "bg-gray-200 dark:bg-dark-card text-gray-700 dark:text-gray-300"
               }`}
             >
               {category.category_name}
@@ -303,7 +334,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
             placeholder="새 카테고리 이름"
-            className="flex-grow p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-grow p-2 border border-gray-300 dark:border-gray-600 dark:bg-dark-card dark:text-white rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             onClick={handleCreateCategory}
@@ -316,13 +347,13 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
 
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             내용
           </label>
           <select 
             value={editorHeight}
             onChange={(e) => setEditorHeight(e.target.value)}
-            className="p-2 border border-gray-300 rounded-lg text-sm"
+            className="p-2 border border-gray-300 dark:border-gray-600 dark:bg-dark-card dark:text-white rounded-lg text-sm"
           >
             <option value="400px">높이: 작게</option>
             <option value="500px">높이: 중간</option>
@@ -330,7 +361,10 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
             <option value="800px">높이: 매우 크게</option>
           </select>
         </div>
-        <div data-color-mode="light">
+        <div
+          className={`dark:bg-dark-card rounded-lg overflow-hidden ${darkMode ? 'dark' : ''}`}
+          data-color-mode={darkMode ? 'dark' : 'light'}
+        >
           {renderEditor()}
         </div>
       </div>

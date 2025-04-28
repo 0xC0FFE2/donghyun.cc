@@ -5,13 +5,45 @@
 @tailwind utilities;
 
 * {
-  font-family: "Wanted Sans", sans-serif;
+  font-family: "Wanted Sans", sans-serif !important;
 }
 
 .w-md-editor * {
-  font-family: "Wanted Sans", sans-serif;
+  /* 에디터는 editor.css 에서 강제로 시스템 폰트 적용 */
+  /* font-family: "Wanted Sans", sans-serif !important; */
 }
 
 .font {
-  font-family: "Wanted Sans", sans-serif;
+  font-family: "Wanted Sans", sans-serif !important;
+}
+
+/* 모노스페이스 폰트 클래스 추가 */
+.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
+
+/* 다크 모드 기본 스타일 */
+@layer base {
+  /* 스크롤바 스타일링 */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  }
+
+  /* 기본 링크 스타일 */
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  /* 선택 스타일 */
+  ::selection {
+    @apply bg-blue-500/30 dark:bg-blue-500/50;
+  }
 }

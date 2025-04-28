@@ -121,7 +121,7 @@ const CategoryPosts: React.FC<CategoryPostsProps> = ({ size, mode }) => {
             </button>
           ))}
         </div>
-        <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+        <div className="absolute left-0 right-0 bottom-0 h-0.5 bg-gray-200 dark:bg-gray-700"></div>
       </div>
 
       {loading && <LoadingSpinner />}
