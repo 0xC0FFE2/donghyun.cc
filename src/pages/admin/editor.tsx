@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
-import "@/styles/editor.css"; // 커스텀 에디터 스타일
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -255,7 +254,6 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
     
     return (
       <MDEditor
-        className="font-mono"
         value={content}
         onChange={(value) => setContent(value || "")}
         height={editorHeight}
@@ -264,7 +262,12 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
         highlightEnable={true}
         textareaProps={{
           placeholder: "내용을 입력하세요...",
-          style: { fontFamily: "monospace" }, // 모노스페이스 폰트 적용
+          spellCheck: false,
+          style: {
+            fontFamily: "monospace, monospace",
+            fontSize: "14px",
+            lineHeight: "1.6"
+          }
         }}
         previewOptions={{
           // 타입 오류를 피하기 위해 rehypePlugins 설정 제거

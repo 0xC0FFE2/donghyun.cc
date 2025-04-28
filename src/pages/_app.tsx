@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import "@/styles/editor.css"; // 에디터 커스텀 스타일
 import type { AppProps } from "next/app";
 import Layout from "@/components/Layout";
 import { ConditionalAuthGuard } from "@/components/providers/authGuard";
