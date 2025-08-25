@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { OAuthSDK } from "nanuid-websdk";
+import { usePathname, useRouter } from "next/navigation";
+import { authManager } from "../../utils/auth";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -10,84 +10,113 @@ interface AuthGuardProps {
 
 export function ConditionalAuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const isProtectedRoute = pathname?.startsWith("/admin");
 
   useEffect(() => {
-    const redirectToLogin = () => {
-      const redirectUrl =
-        "http://id.nanu.cc/oauth?app_name=%EB%8F%99%ED%98%84%20%EA%B8%B0%EC%88%A0%20%EB%B8%94%EB%A1%9C%EA%B7%B8&auth_scope=[%22EMAIL%22]&redirect_uri=https://donghyun.cc/oauth_handler&app_id=7040dad6-b0ed-4b83-ab13-35535e39822e";
-      window.location.href = redirectUrl.toString();
-    };
-
     const checkAuth = async () => {
-      if (typeof window === "undefined" || !isProtectedRoute) {
+      // 보호된 라우트가 아닌 경우 인증 검사 건너뛰기
+      if (!isProtectedRoute) {
         setIsLoading(false);
+        setIsAuthenticated(true);
         return;
       }
 
       try {
-        const currentToken = OAuthSDK.getToken();
-        const refreshToken = OAuthSDK.getRefreshToken();
-
-        if (!currentToken && !refreshToken) {
-          redirectToLogin();
+        // 유효한 토큰이 있는지 확인
+        const token = await authManager.getValidToken();
+        
+        if (!token) {
+          // 토큰이 없으면 로그인 페이지로 리디렉션
+          const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
+          router.push(`/login?redirect=${currentUrl}`);
           return;
         }
 
-        if (currentToken) {
-          const validation = OAuthSDK.validateToken(currentToken);
-          if (!validation.isValid) {
-            if (refreshToken) {
-              try {
-                const newToken = await OAuthSDK.reissueToken(refreshToken);
-                if (!newToken) {
-                  redirectToLogin();
-                  return;
-                }
-              } catch (error) {
-                console.error("Token reissue failed:", error);
-                redirectToLogin();
-                return;
-              }
-            } else {
-              redirectToLogin();
-              return;
-            }
-          }
-        }
-       
-        else if (refreshToken) {
-          try {
-            const newToken = await OAuthSDK.reissueToken(refreshToken);
-            if (!newToken) {
-              redirectToLogin();
-              return;
-            }
-          } catch (error) {
-            console.error("Token reissue failed:", error);
-            redirectToLogin();
-            return;
-          }
+        // 관리자 권한이 있는지 확인
+        const isAdmin = await authManager.isAdmin();
+        if (!isAdmin) {
+          // 관리자가 아니면 홈페이지로 리디렉션
+          router.push("/");
+          return;
         }
 
-        setIsLoading(false);
+        setIsAuthenticated(true);
       } catch (error) {
         console.error("Auth check failed:", error);
-        redirectToLogin();
+        // 에러 발생시 로그인 페이지로 리디렉션
+        const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        router.push(`/login?redirect=${currentUrl}`);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    checkAuth();
-  }, [pathname, isProtectedRoute]);
+    // 클라이언트에서만 실행
+    if (typeof window !== "undefined") {
+      checkAuth();
+    } else {
+      setIsLoading(false);
+    }
+  }, [pathname, isProtectedRoute, router]);
 
+  // 로딩 중이고 보호된 라우트인 경우 로딩 화면 표시
   if (isLoading && isProtectedRoute) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900" />
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">인증 확인 중...</p>
+        </div>
       </div>
     );
   }
 
+  // 보호된 라우트이지만 인증되지 않은 경우 아무것도 렌더링하지 않음
+  if (isProtectedRoute && !isAuthenticated && !isLoading) {
+    return null;
+  }
+
   return <>{children}</>;
+}
+
+// 로그아웃 버튼 컴포넌트
+export function LogoutButton({ className = "" }: { className?: string }) {
+  const handleLogout = () => {
+    if (confirm("로그아웃하시겠습니까?")) {
+      authManager.logout();
+    }
+  };
+
+  return (
+    <button
+      onClick={handleLogout}
+      className={`px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${className}`}
+    >
+      로그아웃
+    </button>
+  );
+}
+
+// 현재 사용자 정보를 표시하는 컴포넌트
+export function UserInfo({ className = "" }: { className?: string }) {
+  const [userInfo, setUserInfo] = useState<any>(null);
+
+  useEffect(() => {
+    const user = authManager.getCurrentUser();
+    setUserInfo(user);
+  }, []);
+
+  if (!userInfo) return null;
+
+  return (
+    <div className={`text-sm text-gray-600 dark:text-gray-400 ${className}`}>
+      <span className="font-medium">{userInfo.sub}</span>
+      <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+        {userInfo.role}
+      </span>
+    </div>
+  );
 }

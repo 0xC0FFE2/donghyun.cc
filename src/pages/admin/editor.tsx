@@ -9,7 +9,7 @@ import axios from "axios";
 import { API_BASE_URL } from "@/config";
 import type { NextPage } from "next";
 import { Category } from "@/types/Category";
-import { OAuthSDK } from "nanuid-websdk";
+import { authManager } from "@/utils/auth";
 
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 
@@ -43,18 +43,13 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
   const [editorHeight, setEditorHeight] = useState<string>("500px");
   const [darkMode, setDarkMode] = useState<boolean>(false);
 
-  const getAuthenticatedAxios = useCallback(async () => {
+  const createApiClient = useCallback(async () => {
     try {
-      const token = await OAuthSDK.getToken();
-      const validation = OAuthSDK.validateToken(token);
-
-      if (!validation.isValid) {
-        const newToken = await OAuthSDK.reissueToken();
-        if (!newToken) {
-          toast.error("세션이 만료되었습니다. 다시 로그인해 주세요.");
-          router.push("/");
-          return null;
-        }
+      const token = await authManager.getValidToken();
+      if (!token) {
+        toast.error("세션이 만료되었습니다. 다시 로그인해 주세요.");
+        router.push("/login");
+        return null;
       }
 
       return axios.create({
@@ -64,7 +59,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
     } catch (error) {
       console.error("Authentication error:", error);
       toast.error("인증 오류가 발생했습니다.");
-      router.push("/");
+      router.push("/login");
       return null;
     }
   }, [router]);
@@ -117,18 +112,21 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const authAxios = await getAuthenticatedAxios();
-      if (!authAxios) return;
+      const apiClient = await createApiClient();
+      if (!apiClient) return;
 
       try {
-        const response = await authAxios.get("/categories");
+        const response = await apiClient.get("/categories");
         setCategories(response.data);
       } catch (error) {
         toast.error("카테고리 목록을 불러오는 데 실패했습니다.");
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          authManager.logout();
+        }
       }
     };
     fetchCategories();
-  }, [getAuthenticatedAxios]);
+  }, [createApiClient]);
 
   // 자동 저장 기능 추가
   useEffect(() => {
@@ -158,15 +156,15 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
 
   const uploadContent = async () => {
     setUploading(true);
-    const authAxios = await getAuthenticatedAxios();
-    if (!authAxios) return;
+    const apiClient = await createApiClient();
+    if (!apiClient) return;
 
     const formData = new FormData();
     const blob = new Blob([content], { type: "text/markdown" });
     formData.append("file", blob, "content.md");
 
     try {
-      const response = await authAxios.post("/upload", formData, {
+      const response = await apiClient.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -177,6 +175,9 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
     } catch (error) {
       console.error("Error uploading file:", error);
       toast.error("파일 업로드 중 오류가 발생했습니다.");
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        authManager.logout();
+      }
       throw error;
     } finally {
       setUploading(false);
@@ -194,14 +195,14 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
       return;
     }
 
-    const authAxios = await getAuthenticatedAxios();
-    if (!authAxios) return;
+    const apiClient = await createApiClient();
+    if (!apiClient) return;
 
     try {
       const contentUrl = await uploadContent();
       if (!contentUrl) return;
 
-      await authAxios.post("/admin/articles", {
+      await apiClient.post("/admin/articles", {
         article_date: new Date().toISOString(),
         article_name: title,
         thumbnail_url: thumbnailURL,
@@ -214,6 +215,9 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
       router.push("/admin");
     } catch (error) {
       toast.error("퍼블리싱 중 오류가 발생했습니다.");
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        authManager.logout();
+      }
     }
   };
 
@@ -231,11 +235,11 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
       return;
     }
 
-    const authAxios = await getAuthenticatedAxios();
-    if (!authAxios) return;
+    const apiClient = await createApiClient();
+    if (!apiClient) return;
 
     try {
-      const response = await authAxios.post("/categories", {
+      const response = await apiClient.post("/categories", {
         category_name: newCategoryName,
       });
       setCategories([...categories, response.data]);
@@ -243,6 +247,9 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
       toast.success("새 카테고리가 생성되었습니다.");
     } catch (error) {
       toast.error("카테고리 생성에 실패했습니다.");
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        authManager.logout();
+      }
     }
   };
 

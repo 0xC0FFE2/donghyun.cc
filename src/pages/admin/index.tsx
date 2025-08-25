@@ -6,8 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { API_BASE_URL } from "@/config";
-import { OAuthSDK } from "nanuid-websdk";
-import { getValidToken } from "@/utils/auth";
+import { authManager } from "@/utils/auth";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Calendar, ChevronLeft, ChevronRight, Edit, Eye, EyeOff, UploadCloud, Info, PenSquare, Trash2, Upload } from "lucide-react";
 
@@ -79,30 +78,39 @@ export default function AdminDashboard() {
     }
   };
 
+  // 인증된 API 클라이언트 생성
+  const createApiClient = async () => {
+    const token = await authManager.getValidToken();
+    if (!token) {
+      throw new Error('No valid token');
+    }
+
+    return axios.create({
+      baseURL: API_BASE_URL,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  };
+
   const verifyAndFetchArticles = useCallback(async () => {
     try {
-      const token = await getValidToken();
-      if (!token) {
-        toast.error("세션이 만료되었습니다. 다시 로그인해 주세요.");
-        OAuthSDK.logout("/");
-        return;
-      }
-      await fetchArticles(token);
+      const apiClient = await createApiClient();
+      await fetchArticles(apiClient);
     } catch (error) {
       toast.error("기사를 가져오는 중 오류가 발생했습니다.");
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        OAuthSDK.logout("/");
+        authManager.logout();
       }
     }
-  }, [router]);
+  }, [currentPage]);
 
   const fetchArticles = useCallback(
-    async (token: string) => {
+    async (apiClient: any) => {
       try {
         setIsLoading(true);
-        const client = await OAuthSDK.createAuthorizedClient(token);
-        const response = await client.get<ArticleResponse>(
-          `${API_BASE_URL}/admin/articles`,
+        const response = await apiClient.get<ArticleResponse>(
+          `/admin/articles`,
           {
             params: { page: currentPage, size: 8 },
           }
@@ -127,15 +135,9 @@ export default function AdminDashboard() {
     if (!selectedArticle) return;
 
     try {
-      const token = await getValidToken();
-      if (!token) {
-        OAuthSDK.logout("/");
-        return;
-      }
-
-      const client = await OAuthSDK.createAuthorizedClient(token);
-      await client.put(
-        `${API_BASE_URL}/admin/articles/${selectedArticle.article_id}`,
+      const apiClient = await createApiClient();
+      await apiClient.put(
+        `/admin/articles/${selectedArticle.article_id}`,
         {
           article_name: selectedArticle.article_name,
           thumbnail_url: selectedArticle.thumbnail_url,
@@ -147,11 +149,11 @@ export default function AdminDashboard() {
 
       toast.success("정상적으로 수정을 완료했어요!");
       setSelectedArticle(null);
-      fetchArticles(token);
+      await verifyAndFetchArticles();
     } catch (error) {
       toast.error("오류가 발생했어요");
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        // OAuthSDK.logout("/");
+        authManager.logout();
       }
     }
   };
@@ -166,21 +168,15 @@ export default function AdminDashboard() {
     }
 
     try {
-      const token = await getValidToken();
-      if (!token) {
-        //OAuthSDK.logout("/");
-        return;
-      }
-
-      const client = await OAuthSDK.createAuthorizedClient(token);
-      await client.delete(`${API_BASE_URL}/admin/articles/${articleId}`);
+      const apiClient = await createApiClient();
+      await apiClient.delete(`/admin/articles/${articleId}`);
 
       toast.success("정상적으로 삭제를 완료했어요!");
-      fetchArticles(token);
+      await verifyAndFetchArticles();
     } catch (error) {
       toast.error("오류가 발생했어요");
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        // OAuthSDK.logout("/");
+        authManager.logout();
       }
     }
   };
@@ -231,13 +227,7 @@ export default function AdminDashboard() {
     setUploadResults([]);
 
     try {
-      const token = await getValidToken();
-      if (!token) {
-        toast.error("세션이 만료되었습니다. 다시 로그인해 주세요.");
-        return;
-      }
-
-      const client = await OAuthSDK.createAuthorizedClient(token);
+      const apiClient = await createApiClient();
       const results = [];
 
       for (const file of files) {
@@ -245,13 +235,11 @@ export default function AdminDashboard() {
         formData.append("file", file);
 
         try {
-          const response = await client.post(`${API_BASE_URL}/upload`, formData, {
+          const response = await apiClient.post(`/upload`, formData, {
             headers: { "Content-Type": "multipart/form-data" }
           });
           
           // 원본 URL과 대체 URL 생성
-          // API가 모의 URL을 반환한다고 가정하고 테스트용 URL을 강제로 넣습니다
-          // 실제 API가 추가되면 이 부분은 적절히 수정하세요
           const originalUrl = response.data.url;
           let finalUrl = originalUrl;
           
@@ -279,6 +267,9 @@ export default function AdminDashboard() {
       setUploadResults(results);
     } catch (error) {
       toast.error("업로드 과정에서 오류가 발생했습니다.");
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        authManager.logout();
+      }
     } finally {
       setUploading(false);
     }
