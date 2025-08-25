@@ -5,7 +5,7 @@ import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { API_BASE_URL } from "@/config";
 import type { NextPage } from "next";
 import { Category } from "@/types/Category";
@@ -43,7 +43,7 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
   const [editorHeight, setEditorHeight] = useState<string>("500px");
   const [darkMode, setDarkMode] = useState<boolean>(false);
 
-  const createApiClient = useCallback(async () => {
+  const createApiClient = useCallback(async (): Promise<AxiosInstance | null> => {
     try {
       const token = await authManager.getValidToken();
       if (!token) {

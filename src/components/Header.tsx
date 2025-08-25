@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import logo from "../assets/logo_full_long_clear.png";
 import ThemeToggle from "./ThemeToggle";
 import { LogoutButton, UserInfo } from "./providers/authGuard";
 import { authManager } from "../utils/auth";
 
 const Header: React.FC = () => {
-  const pathname = usePathname();
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -26,9 +26,9 @@ const Header: React.FC = () => {
     };
 
     checkAuth();
-  }, [pathname]);
+  }, [router.pathname]);
 
-  const isAdminPage = pathname?.startsWith("/admin");
+  const isAdminPage = router.pathname?.startsWith("/admin");
 
   return (
     <header className="fixed bg-black w-full z-50">

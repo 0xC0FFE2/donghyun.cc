@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { authManager } from "../../utils/auth";
 
 interface AuthGuardProps {
@@ -9,11 +9,10 @@ interface AuthGuardProps {
 }
 
 export function ConditionalAuthGuard({ children }: AuthGuardProps) {
-  const pathname = usePathname();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const isProtectedRoute = pathname?.startsWith("/admin");
+  const isProtectedRoute = router.pathname?.startsWith("/admin");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -30,7 +29,7 @@ export function ConditionalAuthGuard({ children }: AuthGuardProps) {
         
         if (!token) {
           // 토큰이 없으면 로그인 페이지로 리디렉션
-          const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
+          const currentUrl = encodeURIComponent(router.asPath);
           router.push(`/login?redirect=${currentUrl}`);
           return;
         }
@@ -47,7 +46,7 @@ export function ConditionalAuthGuard({ children }: AuthGuardProps) {
       } catch (error) {
         console.error("Auth check failed:", error);
         // 에러 발생시 로그인 페이지로 리디렉션
-        const currentUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        const currentUrl = encodeURIComponent(router.asPath);
         router.push(`/login?redirect=${currentUrl}`);
       } finally {
         setIsLoading(false);
@@ -60,7 +59,7 @@ export function ConditionalAuthGuard({ children }: AuthGuardProps) {
     } else {
       setIsLoading(false);
     }
-  }, [pathname, isProtectedRoute, router]);
+  }, [router.pathname, isProtectedRoute, router]);
 
   // 로딩 중이고 보호된 라우트인 경우 로딩 화면 표시
   if (isLoading && isProtectedRoute) {

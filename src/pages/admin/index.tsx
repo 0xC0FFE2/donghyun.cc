@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { API_BASE_URL } from "@/config";
 import { authManager } from "@/utils/auth";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
@@ -79,7 +79,7 @@ export default function AdminDashboard() {
   };
 
   // 인증된 API 클라이언트 생성
-  const createApiClient = async () => {
+  const createApiClient = async (): Promise<AxiosInstance | null> => {
     const token = await authManager.getValidToken();
     if (!token) {
       throw new Error('No valid token');
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
   }, [currentPage]);
 
   const fetchArticles = useCallback(
-    async (apiClient: any) => {
+    async (apiClient: AxiosInstance) => {
       try {
         setIsLoading(true);
         const response = await apiClient.get<ArticleResponse>(

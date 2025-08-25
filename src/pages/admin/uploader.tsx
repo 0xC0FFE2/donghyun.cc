@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { API_BASE_URL } from "@/config";
-import { OAuthSDK } from "nanuid-websdk";
+import { authManager } from "@/utils/auth";
 
 interface FileInputProps {
   onFileChange: (file: File | null) => void;
@@ -63,18 +63,13 @@ const FileUploader: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false);
   const [fileUrl, setFileUrl] = useState<string>("");
 
-  const getAuthenticatedAxios = useCallback(async () => {
+  const createApiClient = useCallback(async (): Promise<AxiosInstance | null> => {
     try {
-      const token = await OAuthSDK.getToken();
-      const validation = OAuthSDK.validateToken(token);
-
-      if (!validation.isValid) {
-        const newToken = await OAuthSDK.reissueToken();
-        if (!newToken) {
-          toast.error("세션이 만료되었습니다. 다시 로그인해 주세요.");
-          router.push("/");
-          return null;
-        }
+      const token = await authManager.getValidToken();
+      if (!token) {
+        toast.error("세션이 만료되었습니다. 다시 로그인해 주세요.");
+        router.push("/login");
+        return null;
       }
 
       return axios.create({
@@ -84,7 +79,7 @@ const FileUploader: React.FC = () => {
     } catch (error) {
       console.error("Authentication error:", error);
       toast.error("인증 오류가 발생했습니다.");
-      router.push("/");
+      router.push("/login");
       return null;
     }
   }, [router]);
@@ -97,14 +92,14 @@ const FileUploader: React.FC = () => {
     }
 
     setUploading(true);
-    const authAxios = await getAuthenticatedAxios();
-    if (!authAxios) return;
+    const apiClient = await createApiClient();
+    if (!apiClient) return;
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await authAxios.post("/upload", formData, {
+      const response = await apiClient.post("/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -114,6 +109,9 @@ const FileUploader: React.FC = () => {
     } catch (error) {
       console.error("Error uploading file:", error);
       toast.error("파일 업로드 중 오류가 발생했습니다.");
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        authManager.logout();
+      }
     } finally {
       setUploading(false);
     }
