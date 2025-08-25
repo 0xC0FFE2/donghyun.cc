@@ -157,7 +157,10 @@ const MarkdownEditorPage: NextPage<MarkdownEditorProps> = ({
   const uploadContent = async () => {
     setUploading(true);
     const apiClient = await createApiClient();
-    if (!apiClient) return;
+    if (!apiClient) {
+      setUploading(false);
+      return;
+    }
 
     const formData = new FormData();
     const blob = new Blob([content], { type: "text/markdown" });

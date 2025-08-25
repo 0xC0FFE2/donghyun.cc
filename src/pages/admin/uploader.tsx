@@ -93,7 +93,10 @@ const FileUploader: React.FC = () => {
 
     setUploading(true);
     const apiClient = await createApiClient();
-    if (!apiClient) return;
+    if (!apiClient) {
+      setUploading(false);
+      return;
+    }
 
     const formData = new FormData();
     formData.append("file", file);

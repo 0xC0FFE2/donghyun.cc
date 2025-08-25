@@ -93,18 +93,6 @@ export default function AdminDashboard() {
     });
   };
 
-  const verifyAndFetchArticles = useCallback(async () => {
-    try {
-      const apiClient = await createApiClient();
-      await fetchArticles(apiClient);
-    } catch (error) {
-      toast.error("기사를 가져오는 중 오류가 발생했습니다.");
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        authManager.logout();
-      }
-    }
-  }, [currentPage]);
-
   const fetchArticles = useCallback(
     async (apiClient: AxiosInstance) => {
       try {
@@ -127,6 +115,22 @@ export default function AdminDashboard() {
     [currentPage]
   );
 
+  const verifyAndFetchArticles = useCallback(async () => {
+    try {
+      const apiClient = await createApiClient();
+      if (!apiClient) {
+        // createApiClient에서 이미 에러 처리와 리다이렉션을 했으므로 여기서는 그냥 리턴
+        return;
+      }
+      await fetchArticles(apiClient);
+    } catch (error) {
+      toast.error("기사를 가져오는 중 오류가 발생했습니다.");
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        authManager.logout();
+      }
+    }
+  }, [fetchArticles]);
+
   useEffect(() => {
     verifyAndFetchArticles();
   }, [verifyAndFetchArticles]);
@@ -136,6 +140,8 @@ export default function AdminDashboard() {
 
     try {
       const apiClient = await createApiClient();
+      if (!apiClient) return;
+
       await apiClient.put(
         `/admin/articles/${selectedArticle.article_id}`,
         {
@@ -169,6 +175,8 @@ export default function AdminDashboard() {
 
     try {
       const apiClient = await createApiClient();
+      if (!apiClient) return;
+
       await apiClient.delete(`/admin/articles/${articleId}`);
 
       toast.success("정상적으로 삭제를 완료했어요!");
@@ -228,6 +236,11 @@ export default function AdminDashboard() {
 
     try {
       const apiClient = await createApiClient();
+      if (!apiClient) {
+        setUploading(false);
+        return;
+      }
+
       const results = [];
 
       for (const file of files) {
